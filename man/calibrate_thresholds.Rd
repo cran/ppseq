@@ -14,6 +14,7 @@ calibrate_thresholds(
   ppp_threshold,
   direction = "greater",
   delta = NULL,
+  monitoring = "futility",
   prior = c(0.5, 0.5),
   S = 5000,
   nsim = 1000
@@ -46,8 +47,8 @@ for one-sample case}
 
 \item{pp_threshold}{the posterior probability threshold of interest}
 
-\item{ppp_threshold}{the posterior probability threshold of interest for
-futility monitoring}
+\item{ppp_threshold}{the posterior predictive probability threshold of
+interest for futility monitoring}
 
 \item{direction}{"greater" (default) if interest is in p(p1 > p0) and "less"
 if interest is in p(p1 < p0) for two-sample case. For one-sample case,
@@ -55,6 +56,9 @@ if interest is in p(p1 < p0) for two-sample case. For one-sample case,
 
 \item{delta}{clinically meaningful difference between groups.
 Typically 0 for the two-sample case. NULL for the one-sample case (default).}
+
+\item{monitoring}{the type of interim monitoring to be performed. One of
+"futility" or "efficacy". Default is "futility".}
 
 \item{prior}{hyperparameters of prior beta distribution.
 Beta(0.5, 0.5) is default}
@@ -86,40 +90,41 @@ for a null setting, and a measure of the power in the alternative setting.
 }
 \description{
 This function is meant to be used in the context of a
-clinical trial with a binary endpoint. For a vector of possible posterior
-decision thresholds, the function simulates many trials and then calculates
-the average number of times the posterior probability exceeds a given
-threshold. In a null case, this will result in the type I error at a given
-threshold. In an alternative case, this will result in the power at a given
-threshold.
+clinical trial with a binary endpoint. For every combination of the provided
+posterior thresholds and predictive thresholds, the function simulates many
+trials and then calculates the average number of times a trial was positive.
+In the null case, this is the type I error for the given thresholds.
+In the alternative case, this is the power for the given thresholds.
 }
 \examples{
 
 # One-sample case
-\donttest{
 set.seed(123)
 
 calibrate_thresholds(
-  p_null = 0.1, p_alt = 0.3,
-  n = seq(5, 25, 5), N = 25, 
-  pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-  ppp_threshold = seq(0.05, 0.2, 0.05),
-  direction = "greater", delta = NULL,
-  prior = c(0.5, 0.5), S = 5000, nsim = 1000
-)
-}
+  p_null = 0.1, 
+  p_alt = 0.4,
+  n = seq(5, 15, 5), 
+  N = 15,
+  pp_threshold = c(0.85, 0.9),
+  ppp_threshold = c(0.1, 0.2),
+  S = 10, 
+  nsim = 10
+  )
 
 # Two-sample case
-\donttest{
-set.seed(123)
+set.seed(456)
 
 calibrate_thresholds(
-  p_null = c(0.1, 0.1), p_alt = c(0.1, 0.3),
-  n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25), 
-  pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-  ppp_threshold = seq(0.05, 0.2, 0.05),
-  direction = "greater", delta = 0,
-  prior = c(0.5, 0.5), S = 5000, nsim = 1000
-)
-}
+  p_null = c(0.1, 0.1), 
+  p_alt = c(0.1, 0.5),
+  n = cbind(seq(5, 15, 5), seq(5, 15, 5)), 
+  N = c(15, 15),
+  pp_threshold = c(0.8, 0.85),
+  ppp_threshold = c(0.2, 0.3),
+  delta = 0,
+  S = 10, 
+  nsim = 10
+  )
+
 }

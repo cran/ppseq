@@ -9,11 +9,8 @@
 #' acceptable power. Specify NULL to return the full range of resulting power.
 #' Defaults to 0 to return all results.
 #' @param ... ignored
-#' 
-#' @return No return value, called for side effects 
-#'
+#' @keywords internal
 #' @export
-
 optimize_design <- function(x,
                             type1_range = c(0, 1),
                             minimum_power = 0, ...) {
@@ -34,55 +31,73 @@ optimize_design <- function(x,
 #' \code{calibrate_thresholds} function
 #' @param type1_range a vector specifying the minimum and maximum acceptable
 #' type I error. Specify NULL to return the full range of resulting type I
-#' error. Defaults to c(0.05, 0.1)
+#' error. Defaults to c(0, 1) to return all results.
 #' @param minimum_power a numeric between 0 and 1 specifying the minimum
 #' acceptable power. Specify NULL to return the full range of resulting power.
-#' Defaults to 0.8.
+#' Defaults to 0 to return all results.
+#' @param w_type1 a user-specified weight on the type 1 error.
+#' Defaults to 1 for no weighting.
+#' @param w_power a user-specified weight on the power. 
+#' Defaults to 1 for no weighting.
+#' @param w_Nnull a user-specified weight on the average sample size under the 
+#' null. Defaults to 1 for no weighting.
+#' @param w_Nalt a user-specified weight on the average sample size under the
+#' alternative. Defaults to 1 for no weighting.
 #' @param ... ignored
 #' 
 #' @return A list of length two containing details of the optimal efficiency
 #' and optimal accuracy designs
 #'
 #' @examples
-#' \donttest{
+#' 
+#' # Setting S = 50 and nsim = 50 for speed
+#' # In practice you would want a much larger sample and more simulations
 #' 
 #' # One-sample case
 #' set.seed(123)
-#'
-#' cal_tbl <- calibrate_thresholds(
-#'   p_null = 0.1, p_alt = 0.3,
-#'   n = seq(5, 25, 5), N = 25, 
-#'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-#'   ppp_threshold = seq(0.05, 0.2, 0.05),
-#'   direction = "greater", delta = NULL,
-#'   prior = c(0.5, 0.5), S = 5000, nsim = 1000
-#' )
-#'
-#' optimize_design(cal_tbl)
+#' 
+#' cal_tbl1 <- calibrate_thresholds(
+#'   p_null = 0.1, 
+#'   p_alt = 0.4,
+#'   n = seq(5, 15, 5), 
+#'   N = 15,
+#'   pp_threshold = c(0.85, 0.9),
+#'   ppp_threshold = c(0.1, 0.2),
+#'   S = 10, 
+#'   nsim = 10
+#'   )
+#' 
+#' optimize_design(cal_tbl1)
 #' 
 #' 
 #' # Two-sample case
-#' set.seed(123)
-#'
-#' cal_tbl2 <- 
-#' calibrate_thresholds(
-#'   p_null = c(0.1, 0.1), p_alt = c(0.1, 0.3),
-#'   n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25), 
-#'   pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-#'   ppp_threshold = seq(0.05, 0.2, 0.05),
-#'   direction = "greater", delta = 0,
-#'   prior = c(0.5, 0.5), S = 5000, nsim = 1000
-#' )
+#' set.seed(456)
+#' 
+#' cal_tbl2 <- calibrate_thresholds(
+#'   p_null = c(0.1, 0.1), 
+#'   p_alt = c(0.1, 0.5),
+#'   n = cbind(seq(5, 15, 5), seq(5, 15, 5)), 
+#'   N = c(15, 15),
+#'   pp_threshold = c(0.8, 0.85),
+#'   ppp_threshold = c(0.2, 0.3),
+#'   delta = 0,
+#'   S = 10, 
+#'   nsim = 10
+#'   )
 #' 
 #' optimize_design(cal_tbl2)
-#' }
 #'
 #' @importFrom dplyr rename mutate filter slice group_by arrange
 #' @export
 
 optimize_design.calibrate_thresholds <- function(x,
-                                                 type1_range = c(0.05, 0.1),
-                                                 minimum_power = 0.8, ...) {
+                                                 type1_range = c(0, 1),
+                                                 minimum_power = 0, 
+                                                 w_type1 = 1, 
+                                                 w_power = 1,
+                                                 w_Nnull = 1,
+                                                 w_Nalt = 1,
+                                                 ...) {
   if (any(class(x) == "calibrate_thresholds") == FALSE)
     stop("x must be class 'calibrate_thresholds', usually an object ",
          "returned from a call to the function ppseq::calibrate_thresholds()")
@@ -104,23 +119,31 @@ optimize_design.calibrate_thresholds <- function(x,
     stop("type1_range must be a numeric vector of length 2 or NULL")
 
   options(tibble.width = Inf)
+  
+  filter_x <- 
+    filter(
+      x$res_summary,
+      prop_pos_null >= type1_range[1] &
+        prop_pos_null <= type1_range[2] &
+        prop_pos_alt >= minimum_power
+    )
+  
+  if (nrow(filter_x) == 0 )
+    stop("No results returned for the given combination of type I error and power. Please try a larger upper bound for type I error and/or a lower minimum power.")
 
   if (length(x$inputs$p_null) == 2) {
     opt_x <-
       rename(
         mutate(
-          filter(
-            x$res_summary,
-            prop_pos_null >= type1_range[1] &
-              prop_pos_null <= type1_range[2] &
-              prop_pos_alt >= minimum_power
-          ),
+          filter_x,
           mean_n_null = (mean_n0_null + mean_n1_null) / 2,
           mean_n_alt = (mean_n0_alt + mean_n1_alt) / 2,
-          ab_dist_metric = ((prop_pos_null - 0)^2 +
-            (prop_pos_alt - 1)^2)^(1 / 2),
-          n_dist_metric = ((mean_n_null - min(mean_n_null))^2 +
-            (mean_n_alt - max(mean_n_alt))^2)^(1 / 2)
+          ab_dist_metric = 
+            (w_type1 * (prop_pos_null - 0)^2 +
+               w_power * (prop_pos_alt - 1)^2)^(1 / 2),
+          n_dist_metric = 
+            (w_Nnull * (mean_n_null - min(mean_n_null))^2 +
+               w_Nalt * (mean_n_alt - max(mean_n_alt))^2)^(1 / 2)
         ),
         `Type I error` = prop_pos_null,
         Power = prop_pos_alt,
@@ -133,16 +156,13 @@ optimize_design.calibrate_thresholds <- function(x,
     opt_x <-
       rename(
         mutate(
-          filter(
-            x$res_summary,
-            prop_pos_null >= type1_range[1] &
-              prop_pos_null <= type1_range[2] &
-              prop_pos_alt >= minimum_power
-          ),
-          ab_dist_metric = ((prop_pos_null - 0)^2 +
-            (prop_pos_alt - 1)^2)^(1 / 2),
-          n_dist_metric = ((mean_n1_null - min(mean_n1_null))^2 +
-            (mean_n1_alt - max(mean_n1_alt))^2)^(1 / 2)
+          filter_x,
+          ab_dist_metric = 
+            (w_type1 * (prop_pos_null - 0)^2 +
+               w_power * (prop_pos_alt - 1)^2)^(1 / 2),
+          n_dist_metric = 
+            (w_Nnull * (mean_n1_null - min(mean_n1_null))^2 +
+               w_Nalt * (mean_n1_alt - max(mean_n1_alt))^2)^(1 / 2)
         ),
         `Type I error` = prop_pos_null,
         Power = prop_pos_alt,
@@ -177,7 +197,6 @@ optimize_design.calibrate_thresholds <- function(x,
       ),
       1
     )
-
 
   list(
     "Optimal accuracy design:" =

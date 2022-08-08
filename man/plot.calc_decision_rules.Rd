@@ -30,22 +30,21 @@ Returns a plot of decision rules from the results of
 when to proceed at the various interim analyses
 }
 \examples{
-\donttest{
+
 set.seed(123)
 
 # Two-sample case
 dec_tbl <- calc_decision_rules(
-n = cbind(seq(5, 25, 5), seq(5, 25, 5)), 
-N = c(25, 25),
-theta = 0.86, 
-ppp = 0.2, 
-p0 = NULL, 
-direction = "greater", 
-delta = 0,
-prior = c(0.5, 0.5), 
-S = 5000)
+  n = cbind(seq(5, 15, 5), seq(5, 15, 5)),
+  N = c(15, 15),
+  theta = 0.86,
+  ppp = 0.2,
+  p0 = NULL,
+  direction = "greater",
+  delta = 0,
+  S = 50
+)
 
-plot(dec_tbl)
-}
+plot(dec_tbl, plotly = FALSE)
 
 }

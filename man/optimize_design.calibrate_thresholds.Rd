@@ -4,7 +4,16 @@
 \alias{optimize_design.calibrate_thresholds}
 \title{Custom optimization method for \code{calibrate_thresholds} objects}
 \usage{
-\method{optimize_design}{calibrate_thresholds}(x, type1_range = c(0.05, 0.1), minimum_power = 0.8, ...)
+\method{optimize_design}{calibrate_thresholds}(
+  x,
+  type1_range = c(0, 1),
+  minimum_power = 0,
+  w_type1 = 1,
+  w_power = 1,
+  w_Nnull = 1,
+  w_Nalt = 1,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class 'calibrate_thresholds', usually returned by the
@@ -12,11 +21,23 @@
 
 \item{type1_range}{a vector specifying the minimum and maximum acceptable
 type I error. Specify NULL to return the full range of resulting type I
-error. Defaults to c(0.05, 0.1)}
+error. Defaults to c(0, 1) to return all results.}
 
 \item{minimum_power}{a numeric between 0 and 1 specifying the minimum
 acceptable power. Specify NULL to return the full range of resulting power.
-Defaults to 0.8.}
+Defaults to 0 to return all results.}
+
+\item{w_type1}{a user-specified weight on the type 1 error.
+Defaults to 1 for no weighting.}
+
+\item{w_power}{a user-specified weight on the power.
+Defaults to 1 for no weighting.}
+
+\item{w_Nnull}{a user-specified weight on the average sample size under the
+null. Defaults to 1 for no weighting.}
+
+\item{w_Nalt}{a user-specified weight on the average sample size under the
+alternative. Defaults to 1 for no weighting.}
 
 \item{...}{ignored}
 }
@@ -33,37 +54,42 @@ accuracy design is the one with the shortest Euclidean distance to the
 upper left point on a plot of the type I error by the power.
 }
 \examples{
-\donttest{
+
+# Setting S = 50 and nsim = 50 for speed
+# In practice you would want a much larger sample and more simulations
 
 # One-sample case
 set.seed(123)
 
-cal_tbl <- calibrate_thresholds(
-  p_null = 0.1, p_alt = 0.3,
-  n = seq(5, 25, 5), N = 25, 
-  pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-  ppp_threshold = seq(0.05, 0.2, 0.05),
-  direction = "greater", delta = NULL,
-  prior = c(0.5, 0.5), S = 5000, nsim = 1000
-)
+cal_tbl1 <- calibrate_thresholds(
+  p_null = 0.1, 
+  p_alt = 0.4,
+  n = seq(5, 15, 5), 
+  N = 15,
+  pp_threshold = c(0.85, 0.9),
+  ppp_threshold = c(0.1, 0.2),
+  S = 10, 
+  nsim = 10
+  )
 
-optimize_design(cal_tbl)
+optimize_design(cal_tbl1)
 
 
 # Two-sample case
-set.seed(123)
+set.seed(456)
 
-cal_tbl2 <- 
-calibrate_thresholds(
-  p_null = c(0.1, 0.1), p_alt = c(0.1, 0.3),
-  n = cbind(seq(5, 25, 5), seq(5, 25, 5)), N = c(25, 25), 
-  pp_threshold = c(0.9, 0.95, 0.96, 0.98),
-  ppp_threshold = seq(0.05, 0.2, 0.05),
-  direction = "greater", delta = 0,
-  prior = c(0.5, 0.5), S = 5000, nsim = 1000
-)
+cal_tbl2 <- calibrate_thresholds(
+  p_null = c(0.1, 0.1), 
+  p_alt = c(0.1, 0.5),
+  n = cbind(seq(5, 15, 5), seq(5, 15, 5)), 
+  N = c(15, 15),
+  pp_threshold = c(0.8, 0.85),
+  ppp_threshold = c(0.2, 0.3),
+  delta = 0,
+  S = 10, 
+  nsim = 10
+  )
 
 optimize_design(cal_tbl2)
-}
 
 }
