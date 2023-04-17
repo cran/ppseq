@@ -1,7 +1,7 @@
 Package: ppseq
 Title: Design Clinical Trials using Sequential Predictive Probability
         Monitoring
-Version: 0.2.0
+Version: 0.2.2
 Authors@R: 
   c(person(given = "Emily C.",
           family = "Zabor",
@@ -30,12 +30,12 @@ VignetteBuilder: knitr
 Imports: dplyr, furrr, ggplot2, plotly, purrr, tibble, patchwork, tidyr
 Config/testthat/edition: 3
 Language: en-US
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2022-08-08 18:45:37 UTC; zabore2
+Packaged: 2023-04-17 14:49:05 UTC; zabore2
 Author: Emily C. Zabor [aut, cre] (<https://orcid.org/0000-0002-1402-4498>),
   Brian P. Hobbs [aut],
   Michael J. Kane [aut] (<https://orcid.org/0000-0003-1899-6662>)
 Maintainer: Emily C. Zabor <zabore2@ccf.org>
 Repository: CRAN
-Date/Publication: 2022-08-08 19:10:02 UTC
+Date/Publication: 2023-04-17 18:20:03 UTC
