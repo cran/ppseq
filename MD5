@@ -1,7 +1,7 @@
-7fe0bf15b61658aa1d4a0701caac22b7 *DESCRIPTION
+2e4a36718d2baae732dc7f80521845cf *DESCRIPTION
 ddb8009f01d9485da520d3dacddfa68a *LICENSE
 1672080db35a6385dd47121c4272eb76 *NAMESPACE
-f58bf03cfadab2d7098988bed3b4e2b8 *NEWS.md
+6824b04d28f039f4cdc9a52b38a560ef *NEWS.md
 bbff6240c8f116d84668c117977ab19a *R/calc_decision_rules.R
 c1eeaec7c3b0bbd569db841eff9ad25a *R/calc_next.R
 04767ae7d03b7d331af831ffb184db40 *R/calc_posterior.R
@@ -19,7 +19,7 @@ e6440c55a3b1e2099a78190e1a6f9a4a *R/print.R
 cfe4d524bbb71e1c45eccc46be6ef566 *R/two_sample_cal_tbl-data.R
 187d5af4c14baa3d2f01a6725904c9dc *R/two_sample_decision_tbl-data.R
 c65e5f316b1f59025025691ddd659f52 *README.md
-62fc3ef45ea0b7a8e0dcf2318e927828 *build/vignette.rds
+d050194d9bd32e49e706fbe91ecbe3a2 *build/vignette.rds
 1f10de879fcc78c233fe00249e944b4c *data/one_sample_cal_tbl.rda
 6d6b7e2c29631db495311d46f15b682d *data/one_sample_decision_tbl.rda
 1292efaecfd6c74c20b6f8dbacfa9e07 *data/two_sample_cal_tbl.rda
@@ -29,10 +29,10 @@ c8c2517ceec8c3b51b662b68686c5846 *inst/REFERENCES.bib
 d9ffb43699bd105a65ad899391b3f50c *inst/WORDLIST
 ad8880159a8a7c5ade7d257170a191ba *inst/doc/one_sample_expansion.R
 c59d6e6e54b76241250f2fad0fa0c256 *inst/doc/one_sample_expansion.Rmd
-462899d22470519f6c3fc739ef4fcf49 *inst/doc/one_sample_expansion.html
+69f4d7539272181c4337d25f5470a31e *inst/doc/one_sample_expansion.html
 1c7572766e46faf77cf529fc51a130a7 *inst/doc/two_sample_randomized.R
 eff344ab6d3d3a77c1680a1ea067157d *inst/doc/two_sample_randomized.Rmd
-50e75e731b89ac947368376ba54c90db *inst/doc/two_sample_randomized.html
+e3d4594c832b968247d86c693260b27c *inst/doc/two_sample_randomized.html
 5add3e4f1ea2b4d7c60b92c2443e5534 *man/calc_decision_rules.Rd
 531dc94114be09bea92de6d81e09062c *man/calc_next.Rd
 cfee8c09d233ccd88c4eaf941478eab9 *man/calc_posterior.Rd
@@ -56,8 +56,6 @@ ae6ed499588eb5a6b258ed5971f95470 *man/sim_dat1.Rd
 345842457cd06ac74e5355859d68a1e0 *man/sim_single_trial.Rd
 669afe0529a00fe8397dddadaedc52c3 *man/two_sample_cal_tbl.Rd
 d5aed4cc12aeaef83a20935530a88294 *man/two_sample_decision_tbl.Rd
-332173f20d20942c02019350ea4dcadc *tests/spelling.R
-e8f0f6ea13cf468865f2285d684d68a1 *tests/spelling.Rout.save
 80b7aae893d62c59b443e9be9ce5df01 *tests/testthat.R
 1f2b0cda53289c015a5f1b5d58ae6c5d *tests/testthat/_snaps/calc_decision_rules.md
 319aceccbd58065d6421800e55b1c66d *tests/testthat/_snaps/calibrate_posterior_threshold.md
